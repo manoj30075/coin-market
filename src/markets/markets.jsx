@@ -10,7 +10,10 @@ function Markets() {
   useEffect(() => {
     get('/exchanges')
       .then((res) => {
-        setMarkets(res.data);
+        const { data } = res;
+        const sortedDataOnTrustRank = data.sort((a, b) => a.trust_score_rank - b.trust_score_rank);
+        // set 10 first markets
+        setMarkets(sortedDataOnTrustRank.slice(0, 10));
         setLoading(false);
       })
       .catch((err) => {
@@ -18,82 +21,42 @@ function Markets() {
       });
   }, []);
 
-  const columns = {
-    id: {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-    },
-    name: {
+  const columns = [
+    {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
+      render: (text) => <b>{text}</b>,
     },
-    symbol: {
-      title: 'Symbol',
-      dataIndex: 'symbol',
-      key: 'symbol',
+    {
+      title: 'Country',
+      dataIndex: 'country',
+      key: 'country',
     },
-    rank: {
-      title: 'Rank',
-      dataIndex: 'rank',
-      key: 'rank',
+    {
+      title: 'URL',
+      dataIndex: 'url',
+      key: 'url',
+      render: (text) => <a href={text}>{text}</a>,
     },
-    price_usd: {
-      title: 'Price (USD)',
-      dataIndex: 'price_usd',
-      key: 'price_usd',
+    {
+      title: 'Logo',
+      dataIndex: 'image',
+      key: 'image',
+      render: (text) => <img src={text} alt="logo" />,
     },
-    price_btc: {
-      title: 'Price (BTC)',
-      dataIndex: 'price_btc',
-      key: 'price_btc',
+    {
+      title: 'Trust rank',
+      dataIndex: 'trust_score_rank',
+      key: 'trust_score_rank',
     },
-    '24h_volume_usd': {
-      title: '24h Volume (USD)',
-      dataIndex: '24h_volume_usd',
-      key: '24h_volume_usd',
-    },
-    market_cap_usd: {
-      title: 'Market Cap (USD)',
-      dataIndex: 'market_cap_usd',
-      key: 'market_cap_usd',
-    },
-    available_supply: {
-      title: 'Available Supply',
-      dataIndex: 'available_supply',
-      key: 'available_supply',
-    },
-    total_supply: {
-      title: 'Total Supply',
-      dataIndex: 'total_supply',
-      key: 'total_supply',
-    },
-    max_supply: {
-      title: 'Max Supply',
-      dataIndex: 'max_supply',
-      key: 'max_supply',
-    },
-    percent_change_1h: {
-      title: '% Change 1h',
-      dataIndex: 'percent_change_1h',
-      key: 'percent_change_1h',
-    },
-    percent_change_24h: {
-      title: '% Change 24h',
-      dataIndex: 'percent_change_24h',
-      key: 'percent_change_24h',
-    },
-  };
+  ];
 
   return (
-    <div>
-      <h1>Markets</h1>
-      <div>
-        {loading ? (
-          <div>Loading...</div>
-        ) : <Table dataSource={markets} columns={columns} />}
-      </div>
+    <div className="table-header">
+      {loading ? (
+        <div>Loading...</div>
+      ) : <Table dataSource={markets} columns={columns} pagination={false} />}
     </div>
   );
 }
